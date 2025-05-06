@@ -108,7 +108,6 @@ def add_symptoms_patient(phn_no,symptoms):
 
 
 
-
 @tool("doctor_registration")
 def add_doctor(id: str,
     doctor_name: str,
@@ -160,7 +159,7 @@ def add_doctor_appointment(id,appointment):
 @tool("dynamodb_editor_agent")
 def dynamodb_editor_agent(query):
     """Use this AI Agent to register patients and doctors into the hospital's database and also use this to add doctor's appointments"""
-    tools=[add_patient,add_doctor,add_doctor_appointment]
+    tools=[add_patient,add_symptoms_patient,add_doctor,add_doctor_appointment]
     agent_llm = ChatBedrockConverse(model_id='anthropic.claude-3-sonnet-20240229-v1:0')
     agent = create_tool_calling_agent(agent_llm, tools, dynamodb_editor_agent_prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools,return_intermediate_steps=True,verbose=True)
