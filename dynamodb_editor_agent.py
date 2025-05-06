@@ -18,6 +18,7 @@ class PatientAdmissionData(BaseModel):
     gender: str = Field(description="Patient's gender")
     symptoms: Optional[List[str]] = Field(default=None, description="List of patient's symptoms")
     suggested_doctor: Optional[str] = Field(default=None, description="Suggested doctor of the patient")
+    possible_disease: Optional['str'] = Field(default=None,description="Possible diseases the patient is suffering from")
 
 class Appointment(BaseModel):
     date: str = Field(description="Date of the appointment (e.g., '2025-05-01')")
@@ -61,11 +62,52 @@ def add_patient(data: PatientAdmissionData):
     
     if data.symptoms:
         item['symptoms'] = data.symptoms
+    else:
+        item['symptoms']=[]
     if data.suggested_doctor:
         item['suggested_doctor'] = data.suggested_doctor
+    else:
+        item['suggested_doctor'] = ''
+    if data.possible_disease:
+        item['possible_diseases']=data.possible_disease
+    else:
+        item['possible_diseases']=''    
+        
     
     table.put_item(Item=item)
     return "Patient record added successfully."
+
+@tool("add_symptoms_to_patient")
+def add_symptoms_patient(phn_no,symptoms):
+    """Use this tool to add Symptoms of the patients to the hospital's database"""
+
+    dynamodb=boto3.resource('dynamodb',region_name='ap-south-1')
+    table=dynamodb.Table("Patients")
+
+    response = table.get_item(Key={'phone_no':phn_no})
+    item = response.get('Item', {'phone_no': phn_no})
+    symptoms_db = item.get('symptoms', [])
+
+    if type(symptoms)==list:
+        print(type(symptoms))
+        symptoms_db.extend(symptoms)
+    else:
+        symptoms_db.append(symptoms)
+    
+    table.update_item(
+    Key={'phone_no': phn_no},
+    UpdateExpression="SET symptoms = :s",
+    ExpressionAttributeValues={':s': symptoms_db}
+)
+    print(f"symptoms added for {phn_no}")
+
+
+
+
+
+
+
+
 
 @tool("doctor_registration")
 def add_doctor(id: str,

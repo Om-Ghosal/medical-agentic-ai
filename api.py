@@ -20,7 +20,9 @@ def save_form(form):
         shutil.copyfileobj(form.file, buffer)
 
 
-
+@app.get('/')
+async def root():
+    return {"message":"Welcome to medical agentic ai"}
 @app.post('/formquery')
 def agentic_ai_endpoint(form:fastapi.UploadFile=fastapi.File(...),q: Optional[str] = fastapi.Query(None)):
     save_form(form)
