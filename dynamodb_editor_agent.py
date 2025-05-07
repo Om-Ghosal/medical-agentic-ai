@@ -102,12 +102,6 @@ def add_symptoms_patient(phn_no,symptoms):
     print(f"symptoms added for {phn_no}")
 
 
-
-
-
-
-
-
 @tool("doctor_registration")
 def add_doctor(id: str,
     doctor_name: str,
